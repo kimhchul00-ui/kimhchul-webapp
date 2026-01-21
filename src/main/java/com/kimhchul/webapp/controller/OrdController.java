@@ -4,6 +4,7 @@ import com.kimhchul.webapp.entity.Ord;
 import com.kimhchul.webapp.entity.OrdItem;
 import com.kimhchul.webapp.service.OrdService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -21,6 +22,9 @@ public class OrdController {
 
     private final OrdService ordService;
 
+    @Value("${app.version:dev}")
+    private String appVersion;
+
     @GetMapping
     public String list(Model model,
                        @RequestParam(required = false) String status,
@@ -36,6 +40,7 @@ public class OrdController {
         }
         
         model.addAttribute("orders", orders);
+        model.addAttribute("appVersion", appVersion);
         return "orders/list";
     }
 

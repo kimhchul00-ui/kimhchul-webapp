@@ -11,6 +11,17 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # 전체 git 히스토리 가져오기
+
+      - name: Get git commit hash
+        id: git-version
+        run: |
+          GIT_COMMIT=$(git rev-parse --short HEAD)
+          GIT_COMMIT_FULL=$(git rev-parse HEAD)
+          echo "VERSION=$GIT_COMMIT" >> $GITHUB_ENV
+          echo "VERSION_FULL=$GIT_COMMIT_FULL" >> $GITHUB_ENV
+          echo "Git commit hash: $GIT_COMMIT"
 
       - name: Execute remote commands via SSH
         # appleboy/ssh-action은 가장 유명한 SSH 접속 플러그인입니다.
@@ -20,6 +31,8 @@ jobs:
           username: ${{ secrets.EC2_USERNAME }}
           key: ${{ secrets.EC2_SSH_KEY }}
           port: 22
+          env:
+            APP_VERSION: ${{ env.VERSION }}
           script: |
             # 서버에 접속해서 실행할 명령어들
             cd ~
@@ -27,5 +40,5 @@ jobs:
             # 스크립트에 실행 권한이 혹시 없을까봐 한 번 더 부여
             chmod +x deploy.sh
             
-            # 배포 스크립트 실행
-            ./deploy.sh
+            # 배포 스크립트 실행 (APP_VERSION 환경변수 전달)
+            APP_VERSION=${{ env.VERSION }} ./deploy.sh

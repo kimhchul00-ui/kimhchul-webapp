@@ -3,6 +3,9 @@ spring:
     name: kimhchul-webapp
   profiles:
     active: local
+
+app:
+  version: ${APP_VERSION:dev}
   jpa:
     hibernate:
       ddl-auto: update

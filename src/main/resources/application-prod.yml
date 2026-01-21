@@ -12,6 +12,9 @@ spring:
     init:
       mode: never
 
+app:
+  version: ${APP_VERSION:prod}
+
 logging:
   level:
     root: WARN

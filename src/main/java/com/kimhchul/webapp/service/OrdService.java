@@ -3,11 +3,13 @@ package com.kimhchul.webapp.service;
 import com.kimhchul.webapp.entity.Ord;
 import com.kimhchul.webapp.entity.OrdItem;
 import com.kimhchul.webapp.repository.OrdRepository;
-import com.kimhchul.webapp.repository.OrdItemRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -17,7 +19,6 @@ import java.util.Optional;
 public class OrdService {
 
     private final OrdRepository ordRepository;
-    private final OrdItemRepository ordItemRepository;
 
     public List<Ord> findAll() {
         return ordRepository.findAllOrderByOrderDateDesc();
@@ -96,5 +97,36 @@ public class OrdService {
 
     public List<Ord> searchByCustomerName(String customerName) {
         return ordRepository.findByCustomerNameContainingIgnoreCase(customerName);
+    }
+
+    public Page<Ord> findWithFilters(String status, String customerName, LocalDateTime startDate, LocalDateTime endDate, Pageable pageable) {
+        boolean hasStatus = status != null && !status.trim().isEmpty();
+        boolean hasCustomerName = customerName != null && !customerName.trim().isEmpty();
+        boolean hasDateRange = startDate != null && endDate != null;
+
+        if (hasDateRange) {
+            if (hasStatus && hasCustomerName) {
+                return ordRepository.findByStatusAndCustomerNameContainingAndOrderDateBetween(
+                    status, customerName, startDate, endDate, pageable);
+            } else if (hasStatus) {
+                return ordRepository.findByStatusAndOrderDateBetween(status, startDate, endDate, pageable);
+            } else if (hasCustomerName) {
+                return ordRepository.findByCustomerNameContainingAndOrderDateBetween(
+                    customerName, startDate, endDate, pageable);
+            } else {
+                return ordRepository.findByOrderDateBetween(startDate, endDate, pageable);
+            }
+        } else {
+            // 날짜 범위가 없을 때
+            if (hasStatus && hasCustomerName) {
+                return ordRepository.findByStatusAndCustomerNameContaining(status, customerName, pageable);
+            } else if (hasStatus) {
+                return ordRepository.findByStatus(status, pageable);
+            } else if (hasCustomerName) {
+                return ordRepository.findByCustomerNameContaining(customerName, pageable);
+            } else {
+                return ordRepository.findAllOrderByOrderDateDesc(pageable);
+            }
+        }
     }
 }

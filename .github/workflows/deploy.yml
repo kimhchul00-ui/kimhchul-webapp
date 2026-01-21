@@ -26,13 +26,13 @@ jobs:
       - name: Execute remote commands via SSH
         # appleboy/ssh-action은 가장 유명한 SSH 접속 플러그인입니다.
         uses: appleboy/ssh-action@master
+        env:
+          APP_VERSION: ${{ env.VERSION }}
         with:
           host: ${{ secrets.EC2_HOST }}
           username: ${{ secrets.EC2_USERNAME }}
           key: ${{ secrets.EC2_SSH_KEY }}
           port: 22
-          env:
-            APP_VERSION: ${{ env.VERSION }}
           script: |
             # 서버에 접속해서 실행할 명령어들
             cd ~

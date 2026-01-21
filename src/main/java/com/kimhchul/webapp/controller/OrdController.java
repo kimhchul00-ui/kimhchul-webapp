@@ -35,6 +35,9 @@ public class OrdController {
     @Value("${app.version:dev}")
     private String appVersion;
 
+    @Value("${server.port:8080}")
+    private String serverPort;
+
     @GetMapping
     public String list(Model model,
                        @RequestParam(required = false) String status,
@@ -70,6 +73,7 @@ public class OrdController {
         model.addAttribute("startDate", startDate);
         model.addAttribute("endDate", endDate);
         model.addAttribute("appVersion", appVersion);
+        model.addAttribute("serverPort", serverPort);
         
         return "orders/list";
     }

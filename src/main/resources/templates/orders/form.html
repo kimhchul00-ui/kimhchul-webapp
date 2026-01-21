@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${ord.id != null ? '주문 수정' : '주문 등록'}">주문 등록</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .item-row {
+            border: 1px solid #dee2e6;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+            background-color: #f8f9fa;
+        }
+    </style>
+</head>
+<body>
+    <div class="container mt-4">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1 th:text="${ord.id != null ? '주문 수정' : '주문 등록'}">주문 등록</h1>
+            <a href="/orders" class="btn btn-secondary">목록</a>
+        </div>
+
+        <form th:action="${ord.id != null ? '/orders/' + ord.id : '/orders'}" 
+              th:object="${ord}" 
+              method="post">
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="card mb-3">
+                        <div class="card-header">
+                            <h5>주문 정보</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="mb-3">
+                                <label class="form-label">주문번호</label>
+                                <input type="text" class="form-control" th:field="*{orderNo}" 
+                                       th:readonly="${ord.id != null}" placeholder="자동 생성됩니다">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">고객명 <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" th:field="*{customerName}" required>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">이메일</label>
+                                <input type="email" class="form-control" th:field="*{customerEmail}">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">상태 <span class="text-danger">*</span></label>
+                                <select class="form-select" th:field="*{status}" required>
+                                    <option value="">선택하세요</option>
+                                    <option value="PENDING">대기중</option>
+                                    <option value="CONFIRMED">확인됨</option>
+                                    <option value="SHIPPED">배송중</option>
+                                    <option value="DELIVERED">배송완료</option>
+                                    <option value="CANCELLED">취소됨</option>
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">배송주소</label>
+                                <textarea class="form-control" th:field="*{shippingAddress}" rows="3"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card mb-3">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5>주문 상품</h5>
+                    <button type="button" class="btn btn-sm btn-primary" onclick="addItemRow()">상품 추가</button>
+                </div>
+                <div class="card-body" id="itemsContainer">
+                    <div th:each="item, iterStat : *{ordItems}" class="item-row" th:attr="data-index=${iterStat.index}">
+                        <input type="hidden" th:field="*{ordItems[__${iterStat.index}__].id}">
+                        <div class="row">
+                            <div class="col-md-4">
+                                <label class="form-label">상품명 <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" 
+                                       th:field="*{ordItems[__${iterStat.index}__].productName}" required>
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label">상품코드</label>
+                                <input type="text" class="form-control" 
+                                       th:field="*{ordItems[__${iterStat.index}__].productCode}">
+                            </div>
+                            <div class="col-md-2">
+                                <label class="form-label">수량 <span class="text-danger">*</span></label>
+                                <input type="number" class="form-control" min="1" 
+                                       th:field="*{ordItems[__${iterStat.index}__].quantity}" required>
+                            </div>
+                            <div class="col-md-2">
+                                <label class="form-label">단가 <span class="text-danger">*</span></label>
+                                <input type="number" class="form-control" min="0" 
+                                       th:field="*{ordItems[__${iterStat.index}__].unitPrice}" required>
+                            </div>
+                            <div class="col-md-1 d-flex align-items-end">
+                                <button type="button" class="btn btn-sm btn-danger" onclick="removeItemRow(this)">삭제</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="d-flex justify-content-end gap-2">
+                <a href="/orders" class="btn btn-secondary">취소</a>
+                <button type="submit" class="btn btn-primary">저장</button>
+            </div>
+        </form>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        let itemIndex = document.querySelectorAll('.item-row').length;
+
+        function addItemRow() {
+            const container = document.getElementById('itemsContainer');
+            const newRow = document.createElement('div');
+            newRow.className = 'item-row';
+            newRow.setAttribute('data-index', itemIndex);
+            
+            newRow.innerHTML = `
+                <input type="hidden" name="ordItems[${itemIndex}].id" value="">
+                <div class="row">
+                    <div class="col-md-4">
+                        <label class="form-label">상품명 <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" name="ordItems[${itemIndex}].productName" required>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label">상품코드</label>
+                        <input type="text" class="form-control" name="ordItems[${itemIndex}].productCode">
+                    </div>
+                    <div class="col-md-2">
+                        <label class="form-label">수량 <span class="text-danger">*</span></label>
+                        <input type="number" class="form-control" min="1" name="ordItems[${itemIndex}].quantity" required>
+                    </div>
+                    <div class="col-md-2">
+                        <label class="form-label">단가 <span class="text-danger">*</span></label>
+                        <input type="number" class="form-control" min="0" name="ordItems[${itemIndex}].unitPrice" required>
+                    </div>
+                    <div class="col-md-1 d-flex align-items-end">
+                        <button type="button" class="btn btn-sm btn-danger" onclick="removeItemRow(this)">삭제</button>
+                    </div>
+                </div>
+            `;
+            
+            container.appendChild(newRow);
+            itemIndex++;
+        }
+
+        function removeItemRow(button) {
+            const container = document.getElementById('itemsContainer');
+            if (container.children.length > 1) {
+                button.closest('.item-row').remove();
+                // 인덱스 재정렬
+                reindexItems();
+            } else {
+                alert('최소 하나의 상품은 필요합니다.');
+            }
+        }
+
+        function reindexItems() {
+            const items = document.querySelectorAll('.item-row');
+            items.forEach((item, index) => {
+                item.setAttribute('data-index', index);
+                const inputs = item.querySelectorAll('input, select');
+                inputs.forEach(input => {
+                    const name = input.getAttribute('name');
+                    if (name) {
+                        input.setAttribute('name', name.replace(/ordItems\[\d+\]/, `ordItems[${index}]`));
+                    }
+                });
+            });
+            itemIndex = items.length;
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,15 @@
+spring:
+  datasource:
+    url: jdbc:h2:file:./data/proddb
+    driver-class-name: org.h2.Driver
+    username: sa
+    password: ${DB_PASSWORD:changeme}
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: false
+
+logging:
+  level:
+    root: WARN
+    com.kimhchul.webapp: INFO

@@ -60,7 +60,10 @@
 <body>
     <div class="container mt-4">
         <div class="d-flex justify-content-between align-items-center mb-4">
-            <h1 th:text="${ord.id != null ? '주문 수정' : '주문 등록'}">주문 등록</h1>
+            <div class="d-flex align-items-center gap-2">
+                <a href="/" class="btn btn-secondary btn-sm">🏠 홈</a>
+                <h1 class="mb-0" th:text="${ord.id != null ? '주문 수정' : '주문 등록'}">주문 등록</h1>
+            </div>
             <a href="/orders" class="btn btn-secondary">목록</a>
         </div>
 

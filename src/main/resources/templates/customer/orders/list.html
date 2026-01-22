@@ -89,6 +89,20 @@
             background-color: #f8f8f8;
             color: #333;
         }
+        .btn-back {
+            background-color: #fff;
+            border: 1px solid #d0d0d0;
+            color: #333;
+            padding: 8px 20px;
+            border-radius: 4px;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 14px;
+        }
+        .btn-back:hover {
+            background-color: #f8f8f8;
+            color: #333;
+        }
         .empty-state {
             text-align: center;
             padding: 60px 20px;
@@ -147,7 +161,10 @@
 <body>
     <div class="header">
         <div class="container">
-            <h1 class="header-title">주문 내역</h1>
+            <div class="d-flex justify-content-between align-items-center">
+                <h1 class="header-title">주문 내역</h1>
+                <a href="/" class="btn-back">🏠 홈</a>
+            </div>
         </div>
     </div>
 

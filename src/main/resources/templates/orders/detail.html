@@ -61,7 +61,10 @@
 <body>
     <div class="container mt-4">
         <div class="d-flex justify-content-between align-items-center mb-4">
-            <h1>주문 상세</h1>
+            <div class="d-flex align-items-center gap-2">
+                <a href="/" class="btn btn-secondary btn-sm">🏠 홈</a>
+                <h1 class="mb-0">주문 상세</h1>
+            </div>
             <div>
                 <a th:href="@{/orders/{id}/edit(id=${ord.id})}" class="btn btn-warning">수정</a>
                 <a href="/orders" class="btn btn-secondary">목록</a>

@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>주문 상세</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+        body {
+            background-color: #f7f7f7;
+            font-family: -apple-system, BlinkMacSystemFont, "Malgun Gothic", "맑은 고딕", helvetica, "Apple SD Gothic Neo", sans-serif;
+        }
+        .header {
+            background-color: #fff;
+            border-bottom: 1px solid #e5e5e5;
+            padding: 20px 0;
+            margin-bottom: 30px;
+        }
+        .header-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: #000;
+            margin: 0;
+        }
+        .content-card {
+            background-color: #fff;
+            border: 1px solid #e5e5e5;
+            border-radius: 8px;
+            padding: 25px;
+            margin-bottom: 20px;
+        }
+        .card-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #000;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+        .info-row {
+            display: flex;
+            padding: 12px 0;
+            border-bottom: 1px solid #f8f8f8;
+        }
+        .info-row:last-child {
+            border-bottom: none;
+        }
+        .info-label {
+            width: 140px;
+            font-size: 14px;
+            color: #666;
+            font-weight: 500;
+        }
+        .info-value {
+            flex: 1;
+            font-size: 14px;
+            color: #000;
+        }
+        .order-status {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 13px;
+            font-weight: 500;
+        }
+        .status-PENDING { background-color: #fff3cd; color: #856404; }
+        .status-CONFIRMED { background-color: #d1ecf1; color: #0c5460; }
+        .status-SHIPPED { background-color: #cfe2ff; color: #084298; }
+        .status-DELIVERED { background-color: #d1e7dd; color: #0f5132; }
+        .status-CANCELLED { background-color: #f8d7da; color: #842029; }
+        .table {
+            margin-bottom: 0;
+        }
+        .table thead th {
+            background-color: #f8f9fa;
+            border-bottom: 2px solid #e5e5e5;
+            font-weight: 600;
+            color: #333;
+            font-size: 14px;
+            padding: 12px;
+        }
+        .table tbody td {
+            padding: 15px 12px;
+            font-size: 14px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        .total-amount {
+            text-align: right;
+            padding: 20px;
+            background-color: #f8f9fa;
+            border-top: 2px solid #e5e5e5;
+        }
+        .total-label {
+            font-size: 16px;
+            color: #666;
+            margin-bottom: 8px;
+        }
+        .total-value {
+            font-size: 24px;
+            font-weight: 700;
+            color: #000;
+        }
+        .btn-back {
+            background-color: #fff;
+            border: 1px solid #d0d0d0;
+            color: #333;
+            padding: 10px 25px;
+            border-radius: 4px;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 14px;
+        }
+        .btn-back:hover {
+            background-color: #f8f8f8;
+            color: #333;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="container">
+            <h1 class="header-title">주문 상세</h1>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="content-card">
+            <div class="card-title">주문 정보</div>
+            <div class="info-row">
+                <div class="info-label">주문번호</div>
+                <div class="info-value" th:text="${ord.orderNo}"></div>
+            </div>
+            <div class="info-row">
+                <div class="info-label">주문일시</div>
+                <div class="info-value" th:text="${#temporals.format(ord.orderDate, 'yyyy-MM-dd HH:mm:ss')}"></div>
+            </div>
+            <div class="info-row">
+                <div class="info-label">주문상태</div>
+                <div class="info-value">
+                    <span class="order-status" th:classappend="'status-' + ${ord.status}" th:text="${ord.status}"></span>
+                </div>
+            </div>
+            <div class="info-row">
+                <div class="info-label">배송지</div>
+                <div class="info-value" th:text="${ord.shippingAddress}"></div>
+            </div>
+        </div>
+
+        <div class="content-card">
+            <div class="card-title">주문 상품</div>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>상품명</th>
+                        <th>수량</th>
+                        <th>단가</th>
+                        <th class="text-end">합계</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="item : ${ord.ordItems}">
+                        <td>
+                            <div th:text="${item.productName}"></div>
+                            <div style="font-size: 12px; color: #999;" th:if="${item.productCode}" th:text="'상품코드: ' + ${item.productCode}"></div>
+                        </td>
+                        <td th:text="${item.quantity}"></td>
+                        <td th:text="${#numbers.formatDecimal(item.unitPrice, 0, 'COMMA', 0, 'POINT')} + '원'"></td>
+                        <td class="text-end" th:text="${#numbers.formatDecimal(item.totalPrice, 0, 'COMMA', 0, 'POINT')} + '원'"></td>
+                    </tr>
+                </tbody>
+            </table>
+            <div th:if="${!ord.orderFees.isEmpty()}" class="mt-3">
+                <div class="card-title" style="font-size: 16px; margin-bottom: 10px;">추가 비용</div>
+                <table class="table">
+                    <tbody>
+                        <tr th:each="fee : ${ord.orderFees}">
+                            <td th:text="${fee.feeName}"></td>
+                            <td colspan="2"></td>
+                            <td class="text-end" th:text="${#numbers.formatDecimal(fee.amount, 0, 'COMMA', 0, 'POINT')} + '원'"></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="total-amount">
+                <div class="total-label">총 결제금액</div>
+                <div class="total-value" th:text="${#numbers.formatDecimal(ord.totalAmount, 0, 'COMMA', 0, 'POINT')} + '원'"></div>
+            </div>
+        </div>
+
+        <div th:if="${!ord.payments.isEmpty()}" class="content-card">
+            <div class="card-title">결제 정보</div>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>결제수단</th>
+                        <th>금액</th>
+                        <th>상태</th>
+                        <th>결제일시</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="payment : ${ord.payments}">
+                        <td th:text="${payment.paymentMethod}"></td>
+                        <td th:text="${#numbers.formatDecimal(payment.amount, 0, 'COMMA', 0, 'POINT')} + '원'"></td>
+                        <td>
+                            <span class="order-status" 
+                                  th:classappend="${payment.paymentStatus == 'PAYMENT'} ? 'status-CONFIRMED' : 
+                                                   (${payment.paymentStatus == 'REFUND'} ? 'status-CANCELLED' : 'status-PENDING')"
+                                  th:text="${payment.paymentStatus == 'PAYMENT' ? '결제완료' : (payment.paymentStatus == 'REFUND' ? '환불' : '부분환불')}"></span>
+                        </td>
+                        <td th:text="${payment.paymentDate != null ? #temporals.format(payment.paymentDate, 'yyyy-MM-dd HH:mm') : ''}"></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="text-center mt-4 mb-4">
+            <a href="/customer/orders" class="btn-back">목록으로</a>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

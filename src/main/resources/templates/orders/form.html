@@ -144,6 +144,101 @@
                 </div>
             </div>
 
+            <div class="card mb-3">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5>추가 비용</h5>
+                    <button type="button" class="btn btn-sm btn-primary" onclick="addFeeRow()">비용 추가</button>
+                </div>
+                <div class="card-body" id="feesContainer">
+                    <div th:each="fee, iterStat : *{orderFees}" class="item-row" th:attr="data-index=${iterStat.index}">
+                        <input type="hidden" th:field="*{orderFees[__${iterStat.index}__].id}">
+                        <div class="row">
+                            <div class="col-md-3">
+                                <label class="form-label">비용 타입 <span class="text-danger">*</span></label>
+                                <select class="form-select" th:field="*{orderFees[__${iterStat.index}__].feeType}" required>
+                                    <option value="">선택하세요</option>
+                                    <option value="SHIPPING">배송비</option>
+                                    <option value="PACKAGING">포장비</option>
+                                    <option value="TIP">팁</option>
+                                    <option value="ETC">기타</option>
+                                </select>
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label">비용명 <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" 
+                                       th:field="*{orderFees[__${iterStat.index}__].feeName}" required>
+                            </div>
+                            <div class="col-md-2">
+                                <label class="form-label">금액 <span class="text-danger">*</span></label>
+                                <input type="number" class="form-control" min="0" 
+                                       th:field="*{orderFees[__${iterStat.index}__].amount}" required>
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label">설명</label>
+                                <input type="text" class="form-control" 
+                                       th:field="*{orderFees[__${iterStat.index}__].description}">
+                            </div>
+                            <div class="col-md-1 d-flex align-items-end">
+                                <button type="button" class="btn btn-sm btn-danger" onclick="removeFeeRow(this)">삭제</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card mb-3">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5>결제 정보</h5>
+                    <button type="button" class="btn btn-sm btn-primary" onclick="addPaymentRow()">결제 추가</button>
+                </div>
+                <div class="card-body" id="paymentsContainer">
+                    <div th:each="payment, iterStat : *{payments}" class="item-row" th:attr="data-index=${iterStat.index}">
+                        <input type="hidden" th:field="*{payments[__${iterStat.index}__].id}">
+                        <div class="row">
+                            <div class="col-md-2">
+                                <label class="form-label">결제 타입 <span class="text-danger">*</span></label>
+                                <select class="form-select" th:field="*{payments[__${iterStat.index}__].paymentType}" required>
+                                    <option value="">선택하세요</option>
+                                    <option value="CARD">카드</option>
+                                    <option value="BANK_TRANSFER">계좌이체</option>
+                                    <option value="MOBILE">모바일</option>
+                                    <option value="CASH">현금</option>
+                                </select>
+                            </div>
+                            <div class="col-md-2">
+                                <label class="form-label">결제 수단 <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" 
+                                       th:field="*{payments[__${iterStat.index}__].paymentMethod}" required>
+                            </div>
+                            <div class="col-md-2">
+                                <label class="form-label">금액 <span class="text-danger">*</span></label>
+                                <input type="number" class="form-control" min="0" 
+                                       th:field="*{payments[__${iterStat.index}__].amount}" required>
+                            </div>
+                            <div class="col-md-2">
+                                <label class="form-label">결제 상태 <span class="text-danger">*</span></label>
+                                <select class="form-select" th:field="*{payments[__${iterStat.index}__].paymentStatus}" required>
+                                    <option value="">선택하세요</option>
+                                    <option value="PAYMENT">결제</option>
+                                    <option value="REFUND">환불</option>
+                                    <option value="PARTIAL_REFUND">부분환불</option>
+                                </select>
+                            </div>
+                            <div class="col-md-2">
+                                <label class="form-label">거래 ID</label>
+                                <input type="text" class="form-control" 
+                                       th:field="*{payments[__${iterStat.index}__].transactionId}">
+                            </div>
+                            <div class="col-md-2">
+                                <label class="form-label">환불 사유</label>
+                                <input type="text" class="form-control" 
+                                       th:field="*{payments[__${iterStat.index}__].refundReason}">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <div class="d-flex justify-content-end gap-2">
                 <a href="/orders" class="btn btn-secondary">취소</a>
                 <button type="submit" class="btn btn-primary">저장</button>
@@ -153,7 +248,9 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        let itemIndex = document.querySelectorAll('.item-row').length;
+        let itemIndex = document.querySelectorAll('#itemsContainer .item-row').length;
+        let feeIndex = document.querySelectorAll('#feesContainer .item-row').length;
+        let paymentIndex = document.querySelectorAll('#paymentsContainer .item-row').length;
 
         function addItemRow() {
             const container = document.getElementById('itemsContainer');
@@ -214,6 +311,140 @@
                 });
             });
             itemIndex = items.length;
+        }
+
+        function addFeeRow() {
+            const container = document.getElementById('feesContainer');
+            const newRow = document.createElement('div');
+            newRow.className = 'item-row';
+            newRow.setAttribute('data-index', feeIndex);
+            
+            newRow.innerHTML = `
+                <input type="hidden" name="orderFees[${feeIndex}].id" value="">
+                <div class="row">
+                    <div class="col-md-3">
+                        <label class="form-label">비용 타입 <span class="text-danger">*</span></label>
+                        <select class="form-select" name="orderFees[${feeIndex}].feeType" required>
+                            <option value="">선택하세요</option>
+                            <option value="SHIPPING">배송비</option>
+                            <option value="PACKAGING">포장비</option>
+                            <option value="TIP">팁</option>
+                            <option value="ETC">기타</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label">비용명 <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" name="orderFees[${feeIndex}].feeName" required>
+                    </div>
+                    <div class="col-md-2">
+                        <label class="form-label">금액 <span class="text-danger">*</span></label>
+                        <input type="number" class="form-control" min="0" name="orderFees[${feeIndex}].amount" required>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label">설명</label>
+                        <input type="text" class="form-control" name="orderFees[${feeIndex}].description">
+                    </div>
+                    <div class="col-md-1 d-flex align-items-end">
+                        <button type="button" class="btn btn-sm btn-danger" onclick="removeFeeRow(this)">삭제</button>
+                    </div>
+                </div>
+            `;
+            
+            container.appendChild(newRow);
+            feeIndex++;
+        }
+
+        function removeFeeRow(button) {
+            const container = document.getElementById('feesContainer');
+            button.closest('.item-row').remove();
+            reindexFees();
+        }
+
+        function reindexFees() {
+            const fees = document.querySelectorAll('#feesContainer .item-row');
+            fees.forEach((fee, index) => {
+                fee.setAttribute('data-index', index);
+                const inputs = fee.querySelectorAll('input, select');
+                inputs.forEach(input => {
+                    const name = input.getAttribute('name');
+                    if (name) {
+                        input.setAttribute('name', name.replace(/orderFees\[\d+\]/, `orderFees[${index}]`));
+                    }
+                });
+            });
+            feeIndex = fees.length;
+        }
+
+        function addPaymentRow() {
+            const container = document.getElementById('paymentsContainer');
+            const newRow = document.createElement('div');
+            newRow.className = 'item-row';
+            newRow.setAttribute('data-index', paymentIndex);
+            
+            newRow.innerHTML = `
+                <input type="hidden" name="payments[${paymentIndex}].id" value="">
+                <div class="row">
+                    <div class="col-md-2">
+                        <label class="form-label">결제 타입 <span class="text-danger">*</span></label>
+                        <select class="form-select" name="payments[${paymentIndex}].paymentType" required>
+                            <option value="">선택하세요</option>
+                            <option value="CARD">카드</option>
+                            <option value="BANK_TRANSFER">계좌이체</option>
+                            <option value="MOBILE">모바일</option>
+                            <option value="CASH">현금</option>
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                        <label class="form-label">결제 수단 <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" name="payments[${paymentIndex}].paymentMethod" required>
+                    </div>
+                    <div class="col-md-2">
+                        <label class="form-label">금액 <span class="text-danger">*</span></label>
+                        <input type="number" class="form-control" min="0" name="payments[${paymentIndex}].amount" required>
+                    </div>
+                    <div class="col-md-2">
+                        <label class="form-label">결제 상태 <span class="text-danger">*</span></label>
+                        <select class="form-select" name="payments[${paymentIndex}].paymentStatus" required>
+                            <option value="">선택하세요</option>
+                            <option value="PAYMENT">결제</option>
+                            <option value="REFUND">환불</option>
+                            <option value="PARTIAL_REFUND">부분환불</option>
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                        <label class="form-label">거래 ID</label>
+                        <input type="text" class="form-control" name="payments[${paymentIndex}].transactionId">
+                    </div>
+                    <div class="col-md-2">
+                        <label class="form-label">환불 사유</label>
+                        <input type="text" class="form-control" name="payments[${paymentIndex}].refundReason">
+                    </div>
+                </div>
+            `;
+            
+            container.appendChild(newRow);
+            paymentIndex++;
+        }
+
+        function removePaymentRow(button) {
+            const container = document.getElementById('paymentsContainer');
+            button.closest('.item-row').remove();
+            reindexPayments();
+        }
+
+        function reindexPayments() {
+            const payments = document.querySelectorAll('#paymentsContainer .item-row');
+            payments.forEach((payment, index) => {
+                payment.setAttribute('data-index', index);
+                const inputs = payment.querySelectorAll('input, select');
+                inputs.forEach(input => {
+                    const name = input.getAttribute('name');
+                    if (name) {
+                        input.setAttribute('name', name.replace(/payments\[\d+\]/, `payments[${index}]`));
+                    }
+                });
+            });
+            paymentIndex = payments.length;
         }
     </script>
 </body>

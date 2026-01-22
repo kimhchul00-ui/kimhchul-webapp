@@ -2,6 +2,8 @@ package com.kimhchul.webapp.controller;
 
 import com.kimhchul.webapp.entity.Ord;
 import com.kimhchul.webapp.entity.OrdItem;
+import com.kimhchul.webapp.entity.OrderFee;
+import com.kimhchul.webapp.entity.Payment;
 import com.kimhchul.webapp.service.OrdService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -110,6 +112,23 @@ public class OrdController {
         item.setQuantity(1);
         item.setUnitPrice(10000L);
         ord.getOrdItems().add(item);
+        
+        // 결제 기본값 설정
+        ord.setPayments(new ArrayList<>());
+        Payment payment = new Payment();
+        payment.setPaymentType("CARD");
+        payment.setPaymentMethod("신용카드");
+        payment.setAmount(10000L);
+        payment.setPaymentStatus("PAYMENT");
+        ord.getPayments().add(payment);
+        
+        // 비용 기본값 설정
+        ord.setOrderFees(new ArrayList<>());
+        OrderFee fee = new OrderFee();
+        fee.setFeeType("SHIPPING");
+        fee.setFeeName("일반배송비");
+        fee.setAmount(3000L);
+        ord.getOrderFees().add(fee);
         
         model.addAttribute("ord", ord);
         return "orders/form";

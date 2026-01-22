@@ -46,6 +46,12 @@ public class Ord {
     @OneToMany(mappedBy = "ord", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<OrdItem> ordItems = new ArrayList<>();
 
+    @OneToMany(mappedBy = "ord", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Payment> payments = new ArrayList<>();
+
+    @OneToMany(mappedBy = "ord", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<OrderFee> orderFees = new ArrayList<>();
+
     @PrePersist
     protected void onCreate() {
         if (orderDate == null) {

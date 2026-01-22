@@ -42,6 +42,8 @@ public class OrdItem {
     public void calculateTotalPrice() {
         if (quantity != null && unitPrice != null) {
             totalPrice = quantity * unitPrice;
+        } else {
+            totalPrice = 0L;
         }
     }
 }

@@ -1,6 +1,6 @@
 spring:
   datasource:
-    url: jdbc:h2:file:./data/proddb
+    url: jdbc:h2:file:./data/proddb;TIME ZONE=Asia/Seoul
     driver-class-name: org.h2.Driver
     username: sa
     password: ${DB_PASSWORD:changeme}

@@ -40,6 +40,9 @@ public class Ord {
     @Column(name = "STATUS", nullable = false, length = 20)
     private String status; // PENDING, CONFIRMED, SHIPPED, DELIVERED, CANCELLED
 
+    @Column(name = "ORDER_TYPE", length = 20)
+    private String orderType; // CONSULTATION(상담주문), CUSTOMER(고객주문)
+
     @Column(name = "SHIPPING_ADDRESS", length = 500)
     private String shippingAddress;
 
@@ -56,6 +59,9 @@ public class Ord {
     protected void onCreate() {
         if (orderDate == null) {
             orderDate = LocalDateTime.now();
+        }
+        if (orderType == null || orderType.trim().isEmpty()) {
+            orderType = "CONSULTATION"; // 기본값: 상담주문
         }
     }
 }

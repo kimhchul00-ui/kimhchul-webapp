@@ -137,6 +137,14 @@
                 <div class="info-value" th:text="${ord.orderNo}"></div>
             </div>
             <div class="info-row">
+                <div class="info-label">주문 유형</div>
+                <div class="info-value">
+                    <span class="badge" 
+                          th:classappend="${ord.orderType == 'CUSTOMER'} ? 'bg-info' : 'bg-secondary'"
+                          th:text="${ord.orderType == 'CUSTOMER' ? '고객주문' : (ord.orderType == 'CONSULTATION' ? '상담주문' : '상담주문')}"></span>
+                </div>
+            </div>
+            <div class="info-row">
                 <div class="info-label">주문일시</div>
                 <div class="info-value" th:text="${#temporals.format(ord.orderDate, 'yyyy-MM-dd HH:mm:ss')}"></div>
             </div>

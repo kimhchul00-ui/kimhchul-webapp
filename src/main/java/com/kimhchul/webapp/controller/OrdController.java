@@ -101,6 +101,9 @@ public class OrdController {
         Random random = new Random();
         ord.setStatus(statuses.get(random.nextInt(statuses.size())));
         
+        // 주문 유형: 기본값 상담주문
+        ord.setOrderType("CONSULTATION");
+        
         // 배송주소: 이름 + " " + 이메일
         ord.setShippingAddress(ord.getCustomerName() + " " + ord.getCustomerEmail());
         

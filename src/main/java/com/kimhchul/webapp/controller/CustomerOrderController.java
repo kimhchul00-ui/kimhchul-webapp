@@ -81,6 +81,7 @@ public class CustomerOrderController {
         String emailTimeStr = timeStr.replace(":", "");
         ord.setCustomerEmail("test" + emailTimeStr + "@test.com");
         ord.setStatus("PENDING");
+        ord.setOrderType("CUSTOMER"); // 고객용은 고객주문으로 설정
         ord.setShippingAddress("");
         
         ord.setOrdItems(new ArrayList<>());
@@ -124,6 +125,11 @@ public class CustomerOrderController {
         // 상태 기본값 설정
         if (ord.getStatus() == null || ord.getStatus().trim().isEmpty()) {
             ord.setStatus("PENDING");
+        }
+        
+        // 주문 유형: 고객용은 고객주문으로 설정
+        if (ord.getOrderType() == null || ord.getOrderType().trim().isEmpty()) {
+            ord.setOrderType("CUSTOMER");
         }
         
         ordService.save(ord);

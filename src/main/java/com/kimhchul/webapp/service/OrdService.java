@@ -83,6 +83,7 @@ public class OrdService {
         existingOrd.setCustomerName(ord.getCustomerName());
         existingOrd.setCustomerEmail(ord.getCustomerEmail());
         existingOrd.setStatus(ord.getStatus());
+        existingOrd.setOrderType(ord.getOrderType() != null ? ord.getOrderType() : "CONSULTATION");
         existingOrd.setShippingAddress(ord.getShippingAddress());
 
         // 기존 아이템 삭제 후 새로 추가

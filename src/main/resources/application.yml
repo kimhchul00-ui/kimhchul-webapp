@@ -20,12 +20,15 @@ spring:
     init:
       mode: always
       data-locations: classpath:data.sql
+  lifecycle:
+    timeout-per-shutdown-phase: 30s
 
 app:
   version: ${APP_VERSION:dev}
 
 server:
   port: 8080
+  shutdown: graceful
 
 logging:
   level:

@@ -3,6 +3,10 @@ spring:
     name: kimhchul-webapp
   profiles:
     active: local
+  thymeleaf:
+    prefix: classpath:/static/
+    suffix: .html
+    cache: false
   jpa:
     hibernate:
       ddl-auto: update

@@ -195,6 +195,22 @@
                     </div>
                     <a href="/orders" class="btn-feature">주문 목록에서 수정</a>
                 </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🛍️</div>
+                    <div class="feature-title">상품 관리</div>
+                    <div class="feature-description">
+                        상품을 등록하고 수정할 수 있습니다. 옵션과 재고를 관리할 수 있습니다.
+                    </div>
+                    <a href="/admin/items" class="btn-feature">상품 목록 보기</a>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">➕</div>
+                    <div class="feature-title">상품 등록</div>
+                    <div class="feature-description">
+                        새로운 상품을 등록하고 옵션을 추가할 수 있습니다.
+                    </div>
+                    <a href="/admin/items/new" class="btn-feature">상품 등록하기</a>
+                </div>
             </div>
         </div>
 
@@ -220,6 +236,14 @@
                         내가 주문한 내역을 날짜별로 조회하고 상세 정보를 확인할 수 있습니다.
                     </div>
                     <a href="/customer/orders" class="btn-feature">주문 내역 보기</a>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🛍️</div>
+                    <div class="feature-title">상품 목록</div>
+                    <div class="feature-description">
+                        등록된 상품을 확인하고 상세 정보를 볼 수 있습니다.
+                    </div>
+                    <a href="/customer/items" class="btn-feature btn-feature-primary">상품 보러 가기</a>
                 </div>
             </div>
         </div>
@@ -256,6 +280,49 @@
                         모든 페이지가 모바일 환경에 최적화되어 있어 언제 어디서나 사용할 수 있습니다.
                     </div>
                 </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🛍️</div>
+                    <div class="feature-title">상품 관리</div>
+                    <div class="feature-description">
+                        상품과 옵션을 체계적으로 관리하고, 재고를 실시간으로 추적할 수 있습니다.
+                    </div>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🛒</div>
+                    <div class="feature-title">바로구매</div>
+                    <div class="feature-description">
+                        상품 상세 페이지에서 바로구매를 통해 빠르게 주문할 수 있습니다.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 사용 가이드 -->
+        <div class="section">
+            <div class="section-title">📖 사용 가이드</div>
+            <div class="section-description">
+                시스템의 주요 기능을 사용하는 방법을 안내합니다.
+            </div>
+            <div class="info-box" style="margin-top: 0;">
+                <div class="info-box-title">🛍️ 상품 구매 가이드</div>
+                <div class="info-box-content">
+                    <ol style="margin: 0; padding-left: 20px;">
+                        <li><strong>상품 목록</strong>에서 원하는 상품을 찾습니다.</li>
+                        <li><strong>상품 상세</strong> 페이지에서 옵션과 수량을 선택합니다.</li>
+                        <li><strong>바로구매</strong>를 클릭하여 주문서로 이동합니다.</li>
+                        <li><strong>주문하기</strong>를 클릭하여 주문서를 작성하고 제출합니다.</li>
+                    </ol>
+                </div>
+            </div>
+            <div class="info-box" style="margin-top: 20px;">
+                <div class="info-box-title">👨‍💼 관리자 가이드</div>
+                <div class="info-box-content">
+                    <ol style="margin: 0; padding-left: 20px;">
+                        <li><strong>상품 관리</strong>: 상품을 등록하고 옵션, 재고, 가격을 관리합니다.</li>
+                        <li><strong>주문 관리</strong>: 주문 목록을 조회하고 상태를 변경합니다.</li>
+                        <li><strong>검색 및 필터</strong>: 날짜, 상태, 고객명으로 주문을 검색합니다.</li>
+                    </ol>
+                </div>
             </div>
         </div>
 
@@ -265,8 +332,11 @@
             <div class="info-box-content">
                 <ul style="margin: 0; padding-left: 20px;">
                     <li>관리자는 <strong>/orders</strong> 경로에서 모든 주문을 관리할 수 있습니다.</li>
+                    <li>관리자는 <strong>/admin/items</strong> 경로에서 상품을 등록하고 관리할 수 있습니다.</li>
                     <li>고객은 <strong>/customer/orders</strong> 경로에서 주문 내역을 조회하고 새 주문을 등록할 수 있습니다.</li>
+                    <li>고객은 <strong>/customer/items</strong> 경로에서 상품을 확인하고 바로구매할 수 있습니다.</li>
                     <li>주문 등록 시 상품과 추가 비용을 함께 입력하면 총 금액이 자동으로 계산됩니다.</li>
+                    <li>상품 상세 페이지에서 바로구매를 클릭하면 주문서로 이동하며 상품이 자동으로 추가됩니다.</li>
                     <li>하나의 주문에 여러 결제 수단을 사용할 수 있으며, 환불 후 재결제도 가능합니다.</li>
                 </ul>
             </div>

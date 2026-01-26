@@ -230,6 +230,7 @@
                                 <th>주문유형</th>
                                 <th>고객명</th>
                                 <th class="mobile-hide">이메일</th>
+                                <th>주문상품</th>
                                 <th>주문일시</th>
                                 <th>총 금액</th>
                                 <th>상태</th>
@@ -238,7 +239,7 @@
                         </thead>
                         <tbody>
                             <tr th:if="${#lists.isEmpty(orders)}">
-                                <td colspan="8" class="text-center py-4">등록된 주문이 없습니다.</td>
+                                <td colspan="9" class="text-center py-4">등록된 주문이 없습니다.</td>
                             </tr>
                             <tr th:each="order : ${orders}">
                                 <td th:text="${order.orderNo}"></td>
@@ -249,6 +250,21 @@
                                 </td>
                                 <td th:text="${order.customerName}"></td>
                                 <td class="mobile-hide" th:text="${order.customerEmail}"></td>
+                                <td style="max-width: 300px;">
+                                    <div th:if="${order.ordItems != null && !order.ordItems.isEmpty()}">
+                                        <div th:each="item : ${order.ordItems}" style="margin-bottom: 4px; font-size: 0.875rem;">
+                                            <div th:text="${item.productName}"></div>
+                                            <div th:if="${item.productCode}" style="font-size: 0.75rem; color: #6c757d;" th:text="'코드: ' + ${item.productCode}"></div>
+                                            <div th:if="${item.uitem != null}" style="font-size: 0.75rem; color: #666; margin-top: 2px;">
+                                                <span th:text="'옵션: ' + ${item.uitem.optionName} + ' - ' + ${item.uitem.optionValue}"></span>
+                                            </div>
+                                            <div style="font-size: 0.75rem; color: #6c757d;" th:text="${item.quantity} + '개'"></div>
+                                        </div>
+                                    </div>
+                                    <div th:if="${order.ordItems == null || order.ordItems.isEmpty()}" style="color: #6c757d; font-size: 0.875rem;">
+                                        상품 없음
+                                    </div>
+                                </td>
                                 <td th:text="${#temporals.format(order.orderDate, 'yyyy-MM-dd HH:mm')}"></td>
                                 <td th:text="${#numbers.formatDecimal(order.totalAmount, 0, 'COMMA', 0, 'POINT')} + '원'"></td>
                                 <td>

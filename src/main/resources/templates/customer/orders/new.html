@@ -178,16 +178,25 @@
                 <div id="itemsContainer">
                     <div th:each="item, iterStat : ${ord.ordItems}" class="item-row" th:data-index="${iterStat.index}">
                         <input type="hidden" th:field="*{ordItems[__${iterStat.index}__].id}">
+                        <input type="hidden" th:if="${item.item != null}" th:name="|ordItems[${iterStat.index}].item.id|" th:value="${item.item.id}">
+                        <input type="hidden" th:if="${item.uitem != null}" th:name="|ordItems[${iterStat.index}].uitem.id|" th:value="${item.uitem.id}">
                         <div class="row g-3">
-                            <div class="col-md-5">
+                            <div class="col-md-4">
                                 <label class="form-label">상품명 <span class="required">*</span></label>
                                 <input type="text" class="form-control" th:field="*{ordItems[__${iterStat.index}__].productName}" required>
+                                <div th:if="${item.uitem != null}" style="font-size: 12px; color: #666; margin-top: 4px;">
+                                    <span th:text="'옵션: ' + ${item.uitem.optionName} + ' - ' + ${item.uitem.optionValue}"></span>
+                                </div>
                             </div>
                             <div class="col-md-3">
+                                <label class="form-label">상품코드</label>
+                                <input type="text" class="form-control" th:field="*{ordItems[__${iterStat.index}__].productCode}">
+                            </div>
+                            <div class="col-md-2">
                                 <label class="form-label">수량 <span class="required">*</span></label>
                                 <input type="number" class="form-control" min="1" th:field="*{ordItems[__${iterStat.index}__].quantity}" required>
                             </div>
-                            <div class="col-md-3">
+                            <div class="col-md-2">
                                 <label class="form-label">단가 <span class="required">*</span></label>
                                 <input type="number" class="form-control" min="0" th:field="*{ordItems[__${iterStat.index}__].unitPrice}" required onchange="calculateTotal()">
                             </div>
@@ -267,15 +276,19 @@
             newRow.innerHTML = `
                 <input type="hidden" name="ordItems[${itemIndex}].id" value="">
                 <div class="row g-3">
-                    <div class="col-md-5">
+                    <div class="col-md-4">
                         <label class="form-label">상품명 <span class="required">*</span></label>
                         <input type="text" class="form-control" name="ordItems[${itemIndex}].productName" required>
                     </div>
                     <div class="col-md-3">
+                        <label class="form-label">상품코드</label>
+                        <input type="text" class="form-control" name="ordItems[${itemIndex}].productCode">
+                    </div>
+                    <div class="col-md-2">
                         <label class="form-label">수량 <span class="required">*</span></label>
                         <input type="number" class="form-control" min="1" name="ordItems[${itemIndex}].quantity" required>
                     </div>
-                    <div class="col-md-3">
+                    <div class="col-md-2">
                         <label class="form-label">단가 <span class="required">*</span></label>
                         <input type="number" class="form-control" min="0" name="ordItems[${itemIndex}].unitPrice" required onchange="calculateTotal()">
                     </div>

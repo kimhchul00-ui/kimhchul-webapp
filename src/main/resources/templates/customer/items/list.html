@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>상품 목록</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+        body {
+            background-color: #f7f7f7;
+            font-family: -apple-system, BlinkMacSystemFont, "Malgun Gothic", "맑은 고딕", helvetica, "Apple SD Gothic Neo", sans-serif;
+        }
+        .header {
+            background-color: #fff;
+            border-bottom: 1px solid #e5e5e5;
+            padding: 20px 0;
+            margin-bottom: 30px;
+        }
+        .header-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: #000;
+            margin: 0;
+        }
+        .product-card {
+            background-color: #fff;
+            border: 1px solid #e5e5e5;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            transition: box-shadow 0.2s;
+            cursor: pointer;
+        }
+        .product-card:hover {
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        .product-image {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            border-radius: 4px;
+            background-color: #f0f0f0;
+            margin-bottom: 15px;
+        }
+        .product-name {
+            font-size: 18px;
+            font-weight: 600;
+            color: #000;
+            margin-bottom: 10px;
+        }
+        .product-price {
+            font-size: 20px;
+            font-weight: 700;
+            color: #000;
+            margin-bottom: 10px;
+        }
+        .product-stock {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 15px;
+        }
+        .btn-view {
+            background-color: #000;
+            color: #fff;
+            padding: 10px 20px;
+            border-radius: 4px;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 14px;
+            font-weight: 500;
+            width: 100%;
+            text-align: center;
+        }
+        .btn-view:hover {
+            background-color: #333;
+            color: #fff;
+        }
+        .btn-back {
+            background-color: #fff;
+            border: 1px solid #d0d0d0;
+            color: #333;
+            padding: 8px 20px;
+            border-radius: 4px;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 14px;
+        }
+        .btn-back:hover {
+            background-color: #f8f8f8;
+            color: #333;
+        }
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            background-color: #fff;
+            border-radius: 8px;
+        }
+        .empty-state-icon {
+            font-size: 48px;
+            color: #ccc;
+            margin-bottom: 20px;
+        }
+        .empty-state-text {
+            font-size: 16px;
+            color: #666;
+            margin-bottom: 30px;
+        }
+        .pagination {
+            justify-content: center;
+            margin-top: 30px;
+        }
+        .pagination .page-link {
+            color: #333;
+            border-color: #e5e5e5;
+        }
+        .pagination .page-item.active .page-link {
+            background-color: #000;
+            border-color: #000;
+            color: #fff;
+        }
+        .pagination .page-link:hover {
+            background-color: #f8f8f8;
+            color: #333;
+        }
+        .product-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 20px;
+        }
+        @media (max-width: 768px) {
+            .product-grid {
+                grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+                gap: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="container">
+            <div class="d-flex justify-content-between align-items-center">
+                <h1 class="header-title">상품 목록</h1>
+                <a href="/" class="btn-back">🏠 홈</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <div th:if="${#lists.isEmpty(items)}" class="empty-state">
+            <div class="empty-state-icon">🛍️</div>
+            <div class="empty-state-text">등록된 상품이 없습니다.</div>
+        </div>
+
+        <div th:if="${!#lists.isEmpty(items)}" class="product-grid">
+            <div th:each="item : ${items}" class="product-card" th:onclick="'location.href=\'/customer/items/' + ${item.id} + '\''">
+                <img th:if="${item.imageUrl}" th:src="${item.imageUrl}" class="product-image" alt="상품 이미지">
+                <div th:unless="${item.imageUrl}" class="product-image" style="display: flex; align-items: center; justify-content: center; color: #999;">
+                    이미지 없음
+                </div>
+                <div class="product-name" th:text="${item.itemName}"></div>
+                <div class="product-price" th:text="${#numbers.formatDecimal(item.price, 0, 'COMMA', 0, 'POINT')} + '원'"></div>
+                <div class="product-stock" th:text="'재고: ' + ${item.stockQuantity} + '개'"></div>
+                <a th:href="@{/customer/items/{id}(id=${item.id})}" class="btn-view">상세보기</a>
+            </div>
+        </div>
+
+        <nav th:if="${totalPages > 1}" aria-label="페이지 네비게이션">
+            <ul class="pagination">
+                <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled'">
+                    <a class="page-link" th:href="@{/customer/items(page=${currentPage - 1}, size=${pageSize})}">이전</a>
+                </li>
+                <li th:each="pageNum : ${#numbers.sequence(0, totalPages - 1)}" 
+                    class="page-item" 
+                    th:classappend="${pageNum == currentPage} ? 'active'">
+                    <a class="page-link" th:href="@{/customer/items(page=${pageNum}, size=${pageSize})}" 
+                       th:text="${pageNum + 1}"></a>
+                </li>
+                <li class="page-item" th:classappend="${currentPage == totalPages - 1} ? 'disabled'">
+                    <a class="page-link" th:href="@{/customer/items(page=${currentPage + 1}, size=${pageSize})}">다음</a>
+                </li>
+            </ul>
+        </nav>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

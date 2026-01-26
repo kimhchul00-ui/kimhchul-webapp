@@ -176,6 +176,9 @@
                         <td>
                             <div th:text="${item.productName}"></div>
                             <div style="font-size: 12px; color: #999;" th:if="${item.productCode}" th:text="'상품코드: ' + ${item.productCode}"></div>
+                            <div th:if="${item.uitem != null}" style="font-size: 12px; color: #666; margin-top: 4px;">
+                                <span th:text="${item.uitem.optionName} + ': ' + ${item.uitem.optionValue}"></span>
+                            </div>
                         </td>
                         <td th:text="${item.quantity}"></td>
                         <td th:text="${#numbers.formatDecimal(item.unitPrice, 0, 'COMMA', 0, 'POINT')} + '원'"></td>

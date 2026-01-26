@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${item.id != null ? '상품 수정' : '상품 등록'}">상품 등록</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f5f5f5;
+        }
+        .card {
+            border: 1px solid #dee2e6;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        .card-header {
+            background-color: #f8f9fa;
+            border-bottom: 1px solid #dee2e6;
+            font-weight: 600;
+        }
+        .item-row {
+            border: 1px solid #dee2e6;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 4px;
+            background-color: #f8f9fa;
+        }
+        .btn-primary {
+            background-color: #cfe2ff;
+            border-color: #b6d4fe;
+            color: #084298;
+        }
+        .btn-primary:hover {
+            background-color: #b6d4fe;
+            border-color: #9ec5fe;
+            color: #052c65;
+        }
+        .btn-danger {
+            background-color: #f8d7da;
+            border-color: #f5c2c7;
+            color: #842029;
+        }
+        .btn-danger:hover {
+            background-color: #f5c2c7;
+            border-color: #f1aeb5;
+            color: #6a1a21;
+        }
+        .btn-secondary {
+            background-color: #e9ecef;
+            border-color: #dee2e6;
+            color: #495057;
+        }
+        .btn-secondary:hover {
+            background-color: #dee2e6;
+            border-color: #ced4da;
+            color: #212529;
+        }
+    </style>
+</head>
+<body>
+    <div class="container mt-4">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div class="d-flex align-items-center gap-2">
+                <a href="/" class="btn btn-secondary btn-sm">🏠 홈</a>
+                <h1 class="mb-0" th:text="${item.id != null ? '상품 수정' : '상품 등록'}">상품 등록</h1>
+            </div>
+            <a href="/admin/items" class="btn btn-secondary">목록</a>
+        </div>
+
+        <form th:action="${item.id != null ? '/admin/items/' + item.id : '/admin/items'}" 
+              th:object="${item}" 
+              method="post">
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="card mb-3">
+                        <div class="card-header">
+                            <h5>상품 정보</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="mb-3">
+                                <label class="form-label">상품코드 <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" th:field="*{itemCode}" 
+                                       th:readonly="${item.id != null}" placeholder="자동 생성됩니다" required>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">상품명 <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" th:field="*{itemName}" required>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">설명</label>
+                                <textarea class="form-control" th:field="*{description}" rows="5"></textarea>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">가격 <span class="text-danger">*</span></label>
+                                <input type="number" class="form-control" min="0" th:field="*{price}" required>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">재고 수량 <span class="text-danger">*</span></label>
+                                <input type="number" class="form-control" min="0" th:field="*{stockQuantity}" required>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">상태 <span class="text-danger">*</span></label>
+                                <select class="form-select" th:field="*{status}" required>
+                                    <option value="">선택하세요</option>
+                                    <option value="ACTIVE">활성</option>
+                                    <option value="INACTIVE">비활성</option>
+                                    <option value="SOLD_OUT">품절</option>
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">이미지 URL</label>
+                                <input type="text" class="form-control" th:field="*{imageUrl}" placeholder="https://...">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card mb-3">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5>옵션 (Uitem)</h5>
+                    <button type="button" class="btn btn-sm btn-primary" onclick="addUitemRow()">옵션 추가</button>
+                </div>
+                <div class="card-body" id="uitemsContainer">
+                    <div th:each="uitem, iterStat : *{uitems}" class="item-row" th:attr="data-index=${iterStat.index}">
+                        <input type="hidden" th:field="*{uitems[__${iterStat.index}__].id}">
+                        <div class="row">
+                            <div class="col-md-3">
+                                <label class="form-label">옵션명 <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" 
+                                       th:field="*{uitems[__${iterStat.index}__].optionName}" 
+                                       placeholder="예: 색상, 사이즈" required>
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label">옵션값 <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" 
+                                       th:field="*{uitems[__${iterStat.index}__].optionValue}" 
+                                       placeholder="예: 빨강, L" required>
+                            </div>
+                            <div class="col-md-2">
+                                <label class="form-label">추가 가격</label>
+                                <input type="number" class="form-control" min="0" 
+                                       th:field="*{uitems[__${iterStat.index}__].additionalPrice}">
+                            </div>
+                            <div class="col-md-2">
+                                <label class="form-label">재고 수량</label>
+                                <input type="number" class="form-control" min="0" 
+                                       th:field="*{uitems[__${iterStat.index}__].stockQuantity}">
+                            </div>
+                            <div class="col-md-1">
+                                <label class="form-label">상태</label>
+                                <select class="form-select" th:field="*{uitems[__${iterStat.index}__].status}">
+                                    <option value="ACTIVE">활성</option>
+                                    <option value="INACTIVE">비활성</option>
+                                    <option value="SOLD_OUT">품절</option>
+                                </select>
+                            </div>
+                            <div class="col-md-1 d-flex align-items-end">
+                                <button type="button" class="btn btn-sm btn-danger" onclick="removeUitemRow(this)">삭제</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="d-flex justify-content-end gap-2">
+                <a href="/admin/items" class="btn btn-secondary">취소</a>
+                <button type="submit" class="btn btn-primary">저장</button>
+            </div>
+        </form>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        let uitemIndex = document.querySelectorAll('#uitemsContainer .item-row').length;
+
+        function addUitemRow() {
+            const container = document.getElementById('uitemsContainer');
+            const newRow = document.createElement('div');
+            newRow.className = 'item-row';
+            newRow.setAttribute('data-index', uitemIndex);
+            
+            newRow.innerHTML = `
+                <input type="hidden" name="uitems[${uitemIndex}].id" value="">
+                <div class="row">
+                    <div class="col-md-3">
+                        <label class="form-label">옵션명 <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" name="uitems[${uitemIndex}].optionName" 
+                               placeholder="예: 색상, 사이즈" required>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label">옵션값 <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" name="uitems[${uitemIndex}].optionValue" 
+                               placeholder="예: 빨강, L" required>
+                    </div>
+                    <div class="col-md-2">
+                        <label class="form-label">추가 가격</label>
+                        <input type="number" class="form-control" min="0" name="uitems[${uitemIndex}].additionalPrice" value="0">
+                    </div>
+                    <div class="col-md-2">
+                        <label class="form-label">재고 수량</label>
+                        <input type="number" class="form-control" min="0" name="uitems[${uitemIndex}].stockQuantity" value="0">
+                    </div>
+                    <div class="col-md-1">
+                        <label class="form-label">상태</label>
+                        <select class="form-select" name="uitems[${uitemIndex}].status">
+                            <option value="ACTIVE">활성</option>
+                            <option value="INACTIVE">비활성</option>
+                            <option value="SOLD_OUT">품절</option>
+                        </select>
+                    </div>
+                    <div class="col-md-1 d-flex align-items-end">
+                        <button type="button" class="btn btn-sm btn-danger" onclick="removeUitemRow(this)">삭제</button>
+                    </div>
+                </div>
+            `;
+            
+            container.appendChild(newRow);
+            uitemIndex++;
+        }
+
+        function removeUitemRow(button) {
+            const container = document.getElementById('uitemsContainer');
+            button.closest('.item-row').remove();
+            reindexUitems();
+        }
+
+        function reindexUitems() {
+            const uitems = document.querySelectorAll('#uitemsContainer .item-row');
+            uitems.forEach((uitem, index) => {
+                uitem.setAttribute('data-index', index);
+                const inputs = uitem.querySelectorAll('input, select');
+                inputs.forEach(input => {
+                    const name = input.getAttribute('name');
+                    if (name) {
+                        input.setAttribute('name', name.replace(/uitems\[\d+\]/, `uitems[${index}]`));
+                    }
+                });
+            });
+            uitemIndex = uitems.length;
+        }
+    </script>
+</body>
+</html>

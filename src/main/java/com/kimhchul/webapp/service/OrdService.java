@@ -1,9 +1,12 @@
 package com.kimhchul.webapp.service;
 
 import com.kimhchul.webapp.entity.Ord;
-import com.kimhchul.webapp.entity.OrdItem;
 import com.kimhchul.webapp.entity.OrderFee;
+import com.kimhchul.webapp.entity.Item;
+import com.kimhchul.webapp.entity.Uitem;
 import com.kimhchul.webapp.repository.OrdRepository;
+import com.kimhchul.webapp.repository.ItemRepository;
+import com.kimhchul.webapp.repository.UitemRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -20,6 +23,8 @@ import java.util.Optional;
 public class OrdService {
 
     private final OrdRepository ordRepository;
+    private final ItemRepository itemRepository;
+    private final UitemRepository uitemRepository;
 
     public List<Ord> findAll() {
         return ordRepository.findAllOrderByOrderDateDesc();
@@ -37,7 +42,52 @@ public class OrdService {
     public Ord save(Ord ord) {
         // OrdItem에 Ord 설정
         if (ord.getOrdItems() != null) {
-            ord.getOrdItems().forEach(item -> item.setOrd(ord));
+            ord.getOrdItems().forEach(item -> {
+                item.setOrd(ord);
+
+                // item/uitem 이 id만 붙어서 넘어오거나, productCode만 넘어오는 케이스를 보정
+                if (item.getItem() != null && item.getItem().getId() != null) {
+                    Item managedItem = itemRepository.findById(item.getItem().getId()).orElse(null);
+                    if (managedItem != null) {
+                        item.setItem(managedItem);
+                        // productName/productCode 누락 보정
+                        if (item.getProductName() == null || item.getProductName().isBlank()) {
+                            item.setProductName(managedItem.getItemName());
+                        }
+                        if (item.getProductCode() == null || item.getProductCode().isBlank()) {
+                            item.setProductCode(managedItem.getItemCode());
+                        }
+                    }
+                } else if (item.getProductCode() != null && !item.getProductCode().isBlank()) {
+                    Item managedItem = itemRepository.findByItemCode(item.getProductCode()).orElse(null);
+                    if (managedItem != null) {
+                        item.setItem(managedItem);
+                        // productName 보정
+                        if (item.getProductName() == null || item.getProductName().isBlank()) {
+                            item.setProductName(managedItem.getItemName());
+                        }
+                        // productCode 정규화
+                        item.setProductCode(managedItem.getItemCode());
+                    }
+                }
+
+                if (item.getUitem() != null && item.getUitem().getId() != null) {
+                    Uitem managedUitem = uitemRepository.findById(item.getUitem().getId()).orElse(null);
+                    if (managedUitem != null) {
+                        item.setUitem(managedUitem);
+                        // uitem만 있고 item이 없는 경우 item 보정
+                        if (item.getItem() == null && managedUitem.getItem() != null) {
+                            item.setItem(managedUitem.getItem());
+                            if (item.getProductCode() == null || item.getProductCode().isBlank()) {
+                                item.setProductCode(managedUitem.getItem().getItemCode());
+                            }
+                            if (item.getProductName() == null || item.getProductName().isBlank()) {
+                                item.setProductName(managedUitem.getItem().getItemName());
+                            }
+                        }
+                    }
+                }
+            });
         }
 
         // Payment에 Ord 설정
@@ -91,6 +141,46 @@ public class OrdService {
         if (ord.getOrdItems() != null) {
             ord.getOrdItems().forEach(item -> {
                 item.setOrd(existingOrd);
+
+                // item/uitem 보정 (save와 동일)
+                if (item.getItem() != null && item.getItem().getId() != null) {
+                    Item managedItem = itemRepository.findById(item.getItem().getId()).orElse(null);
+                    if (managedItem != null) {
+                        item.setItem(managedItem);
+                        if (item.getProductName() == null || item.getProductName().isBlank()) {
+                            item.setProductName(managedItem.getItemName());
+                        }
+                        if (item.getProductCode() == null || item.getProductCode().isBlank()) {
+                            item.setProductCode(managedItem.getItemCode());
+                        }
+                    }
+                } else if (item.getProductCode() != null && !item.getProductCode().isBlank()) {
+                    Item managedItem = itemRepository.findByItemCode(item.getProductCode()).orElse(null);
+                    if (managedItem != null) {
+                        item.setItem(managedItem);
+                        if (item.getProductName() == null || item.getProductName().isBlank()) {
+                            item.setProductName(managedItem.getItemName());
+                        }
+                        item.setProductCode(managedItem.getItemCode());
+                    }
+                }
+
+                if (item.getUitem() != null && item.getUitem().getId() != null) {
+                    Uitem managedUitem = uitemRepository.findById(item.getUitem().getId()).orElse(null);
+                    if (managedUitem != null) {
+                        item.setUitem(managedUitem);
+                        if (item.getItem() == null && managedUitem.getItem() != null) {
+                            item.setItem(managedUitem.getItem());
+                            if (item.getProductCode() == null || item.getProductCode().isBlank()) {
+                                item.setProductCode(managedUitem.getItem().getItemCode());
+                            }
+                            if (item.getProductName() == null || item.getProductName().isBlank()) {
+                                item.setProductName(managedUitem.getItem().getItemName());
+                            }
+                        }
+                    }
+                }
+
                 existingOrd.getOrdItems().add(item);
             });
         }

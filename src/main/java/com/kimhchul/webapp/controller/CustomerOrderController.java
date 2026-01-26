@@ -1,8 +1,11 @@
 package com.kimhchul.webapp.controller;
 
+import com.kimhchul.webapp.entity.Item;
 import com.kimhchul.webapp.entity.Ord;
 import com.kimhchul.webapp.entity.OrdItem;
 import com.kimhchul.webapp.entity.OrderFee;
+import com.kimhchul.webapp.entity.Uitem;
+import com.kimhchul.webapp.service.ItemService;
 import com.kimhchul.webapp.service.OrdService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -29,6 +32,7 @@ import java.util.UUID;
 public class CustomerOrderController {
 
     private final OrdService ordService;
+    private final ItemService itemService;
 
     @Value("${app.version:dev}")
     private String appVersion;
@@ -85,12 +89,60 @@ public class CustomerOrderController {
         ord.setShippingAddress("");
         
         ord.setOrdItems(new ArrayList<>());
-        OrdItem item = new OrdItem();
-        item.setProductName("테스트상품1");
-        item.setProductCode("T0001");
-        item.setQuantity(1);
-        item.setUnitPrice(10000L);
-        ord.getOrdItems().add(item);
+        
+        // 바로구매 상품이 있는 경우 (flash attribute에서 읽기)
+        Long buyNowItemIdValue = null;
+        Long buyNowUitemIdValue = null;
+        Integer buyNowQuantityValue = null;
+        
+        if (model.containsAttribute("buyNowItemId")) {
+            buyNowItemIdValue = (Long) model.getAttribute("buyNowItemId");
+        }
+        if (model.containsAttribute("buyNowUitemId")) {
+            buyNowUitemIdValue = (Long) model.getAttribute("buyNowUitemId");
+        }
+        if (model.containsAttribute("buyNowQuantity")) {
+            buyNowQuantityValue = (Integer) model.getAttribute("buyNowQuantity");
+        }
+        
+        if (buyNowItemIdValue != null) {
+            final Long buyNowItemId = buyNowItemIdValue;
+            final Long buyNowUitemId = buyNowUitemIdValue;
+            final Integer buyNowQuantity = buyNowQuantityValue;
+            
+            Item item = itemService.findById(buyNowItemId)
+                    .orElseThrow(() -> new RuntimeException("상품을 찾을 수 없습니다: " + buyNowItemId));
+            
+            OrdItem ordItem = new OrdItem();
+            ordItem.setItem(item);
+            ordItem.setProductName(item.getItemName());
+            ordItem.setProductCode(item.getItemCode());
+            ordItem.setQuantity(buyNowQuantity != null ? buyNowQuantity : 1);
+            
+            Long unitPrice = item.getPrice();
+            if (buyNowUitemId != null) {
+                final Long finalUitemId = buyNowUitemId;
+                Uitem uitem = item.getUitems().stream()
+                        .filter(u -> u.getId().equals(finalUitemId))
+                        .findFirst()
+                        .orElse(null);
+                if (uitem != null) {
+                    ordItem.setUitem(uitem);
+                    unitPrice = item.getPrice() + uitem.getAdditionalPrice();
+                }
+            }
+            
+            ordItem.setUnitPrice(unitPrice);
+            ord.getOrdItems().add(ordItem);
+        } else {
+            // 기본 샘플 상품
+            OrdItem item = new OrdItem();
+            item.setProductName("테스트상품1");
+            item.setProductCode("T0001");
+            item.setQuantity(1);
+            item.setUnitPrice(10000L);
+            ord.getOrdItems().add(item);
+        }
         
         ord.setOrderFees(new ArrayList<>());
         OrderFee fee = new OrderFee();

@@ -65,6 +65,37 @@
         .status-SHIPPED { background-color: #cfe2ff; color: #084298; }
         .status-DELIVERED { background-color: #d1e7dd; color: #0f5132; }
         .status-CANCELLED { background-color: #f8d7da; color: #842029; }
+        .order-items {
+            margin: 15px 0;
+            padding: 15px;
+            background-color: #f8f9fa;
+            border-radius: 4px;
+        }
+        .order-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+            border-bottom: 1px solid #e5e5e5;
+        }
+        .order-item:last-child {
+            border-bottom: none;
+        }
+        .order-item-name {
+            flex: 1;
+            font-size: 14px;
+            color: #333;
+        }
+        .order-item-option {
+            font-size: 12px;
+            color: #666;
+            margin-top: 2px;
+        }
+        .order-item-quantity {
+            font-size: 13px;
+            color: #666;
+            margin: 0 10px;
+        }
         .order-info {
             display: flex;
             justify-content: space-between;
@@ -208,6 +239,18 @@
                     <div class="order-date" th:text="${#temporals.format(order.orderDate, 'yyyy-MM-dd HH:mm')}"></div>
                 </div>
                 <span class="order-status" th:classappend="'status-' + ${order.status}" th:text="${order.status}"></span>
+            </div>
+            <div th:if="${!order.ordItems.isEmpty()}" class="order-items">
+                <div th:each="item : ${order.ordItems}" class="order-item">
+                    <div class="order-item-name">
+                        <div th:text="${item.productName}"></div>
+                        <div th:if="${item.productCode}" style="font-size: 12px; color: #999; margin-top: 2px;" th:text="'상품코드: ' + ${item.productCode}"></div>
+                        <div th:if="${item.uitem != null}" class="order-item-option">
+                            <span th:text="'옵션: ' + ${item.uitem.optionName} + ' - ' + ${item.uitem.optionValue}"></span>
+                        </div>
+                    </div>
+                    <div class="order-item-quantity" th:text="${item.quantity} + '개'"></div>
+                </div>
             </div>
             <div class="order-info">
                 <div class="order-amount" th:text="${#numbers.formatDecimal(order.totalAmount, 0, 'COMMA', 0, 'POINT')} + '원'"></div>

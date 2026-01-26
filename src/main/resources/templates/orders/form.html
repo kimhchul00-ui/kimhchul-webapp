@@ -126,11 +126,16 @@
                 <div class="card-body" id="itemsContainer">
                     <div th:each="item, iterStat : *{ordItems}" class="item-row" th:attr="data-index=${iterStat.index}">
                         <input type="hidden" th:field="*{ordItems[__${iterStat.index}__].id}">
+                        <input type="hidden" th:if="${item.item != null}" th:name="|ordItems[${iterStat.index}].item.id|" th:value="${item.item.id}">
+                        <input type="hidden" th:if="${item.uitem != null}" th:name="|ordItems[${iterStat.index}].uitem.id|" th:value="${item.uitem.id}">
                         <div class="row">
                             <div class="col-md-4">
                                 <label class="form-label">상품명 <span class="text-danger">*</span></label>
                                 <input type="text" class="form-control" 
                                        th:field="*{ordItems[__${iterStat.index}__].productName}" required>
+                                <div th:if="${item.uitem != null}" style="font-size: 12px; color: #666; margin-top: 4px;">
+                                    <span th:text="'옵션: ' + ${item.uitem.optionName} + ' - ' + ${item.uitem.optionValue}"></span>
+                                </div>
                             </div>
                             <div class="col-md-3">
                                 <label class="form-label">상품코드</label>
@@ -271,6 +276,7 @@
             
             newRow.innerHTML = `
                 <input type="hidden" name="ordItems[${itemIndex}].id" value="">
+                <!-- item/uitem id는 선택 UI가 생기기 전까지 전송하지 않음 (빈 값 전송 시 transient 객체 이슈 가능) -->
                 <div class="row">
                     <div class="col-md-4">
                         <label class="form-label">상품명 <span class="text-danger">*</span></label>

@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${item.itemName}">상품 상세</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+        body {
+            background-color: #f7f7f7;
+            font-family: -apple-system, BlinkMacSystemFont, "Malgun Gothic", "맑은 고딕", helvetica, "Apple SD Gothic Neo", sans-serif;
+        }
+        .header {
+            background-color: #fff;
+            border-bottom: 1px solid #e5e5e5;
+            padding: 20px 0;
+            margin-bottom: 30px;
+        }
+        .header-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: #000;
+            margin: 0;
+        }
+        .product-detail {
+            background-color: #fff;
+            border-radius: 8px;
+            padding: 30px;
+            margin-bottom: 30px;
+        }
+        .product-image {
+            width: 100%;
+            max-width: 500px;
+            height: 400px;
+            object-fit: cover;
+            border-radius: 8px;
+            background-color: #f0f0f0;
+            margin-bottom: 20px;
+        }
+        .product-name {
+            font-size: 28px;
+            font-weight: 700;
+            color: #000;
+            margin-bottom: 15px;
+        }
+        .product-price {
+            font-size: 32px;
+            font-weight: 700;
+            color: #000;
+            margin-bottom: 20px;
+        }
+        .product-description {
+            font-size: 16px;
+            color: #666;
+            line-height: 1.6;
+            margin-bottom: 30px;
+            white-space: pre-line;
+        }
+        .product-info {
+            border-top: 1px solid #e5e5e5;
+            padding-top: 20px;
+            margin-top: 20px;
+        }
+        .info-row {
+            display: flex;
+            padding: 10px 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        .info-label {
+            width: 120px;
+            font-weight: 600;
+            color: #666;
+        }
+        .info-value {
+            flex: 1;
+            color: #000;
+        }
+        .option-select {
+            margin-bottom: 15px;
+        }
+        .option-select label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #333;
+        }
+        .option-select select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #d0d0d0;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        .quantity-select {
+            margin-bottom: 20px;
+        }
+        .quantity-select label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #333;
+        }
+        .quantity-select input {
+            width: 100px;
+            padding: 10px;
+            border: 1px solid #d0d0d0;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        .btn-buy-now {
+            background-color: #000;
+            color: #fff;
+            padding: 15px 30px;
+            border-radius: 4px;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            font-weight: 600;
+            width: 100%;
+            text-align: center;
+            border: none;
+            cursor: pointer;
+            margin-bottom: 10px;
+        }
+        .btn-buy-now:hover {
+            background-color: #333;
+            color: #fff;
+        }
+        .btn-back {
+            background-color: #fff;
+            border: 1px solid #d0d0d0;
+            color: #333;
+            padding: 8px 20px;
+            border-radius: 4px;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 14px;
+        }
+        .btn-back:hover {
+            background-color: #f8f8f8;
+            color: #333;
+        }
+        .stock-warning {
+            color: #dc3545;
+            font-size: 14px;
+            margin-top: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="container">
+            <div class="d-flex justify-content-between align-items-center">
+                <h1 class="header-title">상품 상세</h1>
+                <a href="/customer/items" class="btn-back">← 상품 목록</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="product-detail">
+            <div class="row">
+                <div class="col-md-6">
+                    <img th:if="${item.imageUrl}" th:src="${item.imageUrl}" class="product-image" alt="상품 이미지">
+                    <div th:unless="${item.imageUrl}" class="product-image" style="display: flex; align-items: center; justify-content: center; color: #999;">
+                        이미지 없음
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="product-name" th:text="${item.itemName}"></div>
+                    <div class="product-price" th:text="${#numbers.formatDecimal(item.price, 0, 'COMMA', 0, 'POINT')} + '원'"></div>
+                    
+                    <div th:if="${!#lists.isEmpty(item.uitems)}" class="option-select">
+                        <label>옵션 선택</label>
+                        <select id="uitemSelect" onchange="updatePrice()">
+                            <option value="">옵션을 선택하세요</option>
+                            <option th:each="uitem : ${item.uitems}" 
+                                    th:value="${uitem.id}" 
+                                    th:data-price="${uitem.additionalPrice}"
+                                    th:data-stock="${uitem.stockQuantity}"
+                                    th:text="${uitem.optionName} + ': ' + ${uitem.optionValue} + ' (+' + ${#numbers.formatDecimal(uitem.additionalPrice, 0, 'COMMA', 0, 'POINT')} + '원)'"></option>
+                        </select>
+                    </div>
+                    
+                    <div class="quantity-select">
+                        <label>수량</label>
+                        <input type="number" id="quantity" min="1" value="1" onchange="updatePrice()">
+                        <div id="stockInfo" class="stock-warning" style="display: none;"></div>
+                    </div>
+                    
+                    <div class="product-info">
+                        <div class="info-row">
+                            <div class="info-label">상품코드</div>
+                            <div class="info-value" th:text="${item.itemCode}"></div>
+                        </div>
+                        <div class="info-row">
+                            <div class="info-label">재고</div>
+                            <div class="info-value" th:text="${item.stockQuantity} + '개'"></div>
+                        </div>
+                    </div>
+                    
+                    <form th:action="@{/customer/items/{id}/buy-now(id=${item.id})}" method="post" id="buyNowForm">
+                        <input type="hidden" name="uitemId" id="uitemId">
+                        <input type="hidden" name="quantity" id="quantityValue" value="1">
+                        <button type="submit" class="btn-buy-now" th:disabled="${item.stockQuantity == 0}">
+                            <span th:if="${item.stockQuantity > 0}">바로구매</span>
+                            <span th:if="${item.stockQuantity == 0}">품절</span>
+                        </button>
+                    </form>
+                </div>
+            </div>
+            
+            <div th:if="${item.description}" class="product-description" th:text="${item.description}"></div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        const basePrice = [[${item.price}]];
+        
+        function updatePrice() {
+            const uitemSelect = document.getElementById('uitemSelect');
+            const quantity = parseInt(document.getElementById('quantity').value) || 1;
+            const stockInfo = document.getElementById('stockInfo');
+            const quantityValue = document.getElementById('quantityValue');
+            const uitemId = document.getElementById('uitemId');
+            
+            quantityValue.value = quantity;
+            
+            if (uitemSelect && uitemSelect.value) {
+                const selectedOption = uitemSelect.options[uitemSelect.selectedIndex];
+                const additionalPrice = parseInt(selectedOption.dataset.price) || 0;
+                const stock = parseInt(selectedOption.dataset.stock) || 0;
+                
+                uitemId.value = uitemSelect.value;
+                
+                if (stock < quantity) {
+                    stockInfo.style.display = 'block';
+                    stockInfo.textContent = '재고가 부족합니다. (재고: ' + stock + '개)';
+                    document.querySelector('.btn-buy-now').disabled = true;
+                } else {
+                    stockInfo.style.display = 'none';
+                    document.querySelector('.btn-buy-now').disabled = false;
+                }
+            } else {
+                uitemId.value = '';
+                const stock = [[${item.stockQuantity}]];
+                if (stock < quantity) {
+                    stockInfo.style.display = 'block';
+                    stockInfo.textContent = '재고가 부족합니다. (재고: ' + stock + '개)';
+                    document.querySelector('.btn-buy-now').disabled = true;
+                } else {
+                    stockInfo.style.display = 'none';
+                    document.querySelector('.btn-buy-now').disabled = false;
+                }
+            }
+        }
+        
+        document.getElementById('quantity').addEventListener('change', updatePrice);
+        if (document.getElementById('uitemSelect')) {
+            document.getElementById('uitemSelect').addEventListener('change', updatePrice);
+        }
+    </script>
+</body>
+</html>

@@ -22,6 +22,14 @@ public class OrdItem {
     @JoinColumn(name = "ORD_ID", nullable = false)
     private Ord ord;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "ITEM_ID")
+    private Item item;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "UITEM_ID")
+    private Uitem uitem;
+
     @Column(name = "PRODUCT_NAME", nullable = false, length = 200)
     private String productName;
 
